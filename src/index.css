@@ -1,0 +1,687 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: local('Cairo'), local('Cairo-Regular'), local('Segoe UI'), local('Tahoma');
+}
+
+/* 🎨 Theme Constants */
+:root {
+  --app-bg: #ffffff;
+  --app-text: #0F172A;
+  --primary-color: #429EBD;
+  --primary-dark: #053F5C;
+  --accent-color: #9FE7F5;
+  color-scheme: light !important;
+}
+
+/* Force light mode colors when NOT in dark class */
+html:not(.dark) {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+html:not(.dark) body {
+  background-color: #ffffff !important;
+}
+
+.dark {
+  --app-bg: #0F172A;
+  --app-text: #F8FAFC;
+}
+
+/* 🔌 Base Styles */
+html {
+  /* Enable safe area on iOS/Android */
+  height: 100%;
+  height: -webkit-fill-available;
+  /* Prevent Android WebView from forcing dark mode */
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--app-bg) !important;
+  color: var(--app-text) !important;
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  /* Ensure body fills viewport but padding is handled by components */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Force English numerals */
+  font-feature-settings: "tnum" on, "lnum" on;
+}
+
+/* Force English numerals everywhere */
+* {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Ensure numbers are always in English */
+.english-nums {
+  font-feature-settings: "tnum" on, "lnum" on;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+/* 📱 Safe Area Utilities */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.safe-all {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* 🌙 Dark Mode Manual Overrides (Highly Reliable) */
+.dark .bg-white,
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: #1E293B !important;
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: #F8FAFC !important;
+}
+
+.dark .border-white,
+.dark .border-slate-50,
+.dark .border-slate-100 {
+  border-color: #334155 !important;
+}
+
+/* ☀️ Light Mode Force Overrides (Prevent Android Dark Mode) */
+html:not(.dark) .bg-white {
+  background-color: #ffffff !important;
+}
+
+html:not(.dark) .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+}
+
+/* Force dark text colors in light mode */
+html:not(.dark) .text-slate-900,
+html:not(.dark) .text-slate-800,
+html:not(.dark) .text-slate-700,
+html:not(.dark) .text-slate-600 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-slate-500,
+html:not(.dark) .text-slate-400 {
+  color: #64748b !important;
+}
+
+/* Fix specific HSA brand colors */
+html:not(.dark) .text-\[\#053F5C\] {
+  color: #053F5C !important;
+}
+
+/* Fix border colors */
+html:not(.dark) .border-slate-100,
+html:not(.dark) .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Fix card backgrounds */
+html:not(.dark) .bg-white\/80,
+html:not(.dark) .bg-white\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 🌀 Custom Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .glass {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #429EBD 0%, #2E7A94 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 📱 Mobile Optimized */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* 🎬 Animations */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.4s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* 🔘 Button Base Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #429EBD 0%, #053F5C 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(66, 158, 189, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(66, 158, 189, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 🃏 Card Styles */
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(159, 231, 245, 0.3);
+  transition: all 0.3s ease;
+}
+
+.dark .card {
+  background: #1E293B;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* 📊 Stats Card */
+.stat-card {
+  background: linear-gradient(135deg, rgba(66, 158, 189, 0.1) 0%, rgba(159, 231, 245, 0.1) 100%);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(66, 158, 189, 0.2);
+}
+
+.dark .stat-card {
+  background: linear-gradient(135deg, rgba(66, 158, 189, 0.15) 0%, rgba(30, 41, 59, 0.9) 100%);
+  border-color: rgba(66, 158, 189, 0.3);
+}
+
+/* 🏷️ Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.badge-info {
+  background: rgba(66, 158, 189, 0.1);
+  color: #429EBD;
+}
+
+/* 📝 Input Styles */
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid rgba(159, 231, 245, 0.3);
+  background: white;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #429EBD;
+  box-shadow: 0 0 0 3px rgba(66, 158, 189, 0.2);
+}
+
+.dark .input-field {
+  background: #1E293B;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* 📋 Table Styles */
+.table-container {
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(159, 231, 245, 0.3);
+}
+
+.dark .table-container {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 🔄 Loading Spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(66, 158, 189, 0.2);
+  border-top-color: #429EBD;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   📱 MOBILE-FIRST ENHANCEMENTS
+   ========================================== */
+
+/* Main App Container - Safe Area Support */
+.app-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
+  /* Space for bottom nav */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Page Content - Mobile optimized */
+.page-content {
+  padding: 1rem;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 100px);
+  min-height: calc(100vh - 80px);
+}
+
+/* Header - Safe Area for Status Bar */
+.mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding-top: env(safe-area-inset-top, 0px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Bottom Navigation - Safe Area Support */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dark .bottom-nav {
+  background: rgba(15, 23, 42, 0.95);
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Floating Action Button */
+.fab {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+  right: calc(env(safe-area-inset-right, 0px) + 20px);
+  z-index: 45;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Cards */
+.mobile-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.dark .mobile-card {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-card:active {
+  transform: scale(0.98);
+}
+
+/* Touch-Friendly Buttons */
+.touch-btn {
+  min-height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.touch-btn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Mobile Modal - Slide from Bottom */
+.mobile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.mobile-modal {
+  width: 100%;
+  max-height: 90vh;
+  background: white;
+  border-radius: 1.5rem 1.5rem 0 0;
+  padding: 1.5rem;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
+  animation: slide-up 0.3s ease-out;
+}
+
+.dark .mobile-modal {
+  background: #1e293b;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Input Fields */
+.mobile-input {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  background: rgba(0, 0, 0, 0.05);
+  font-size: 16px;
+  /* Prevents zoom on iOS */
+  transition: all 0.2s ease;
+}
+
+.mobile-input:focus {
+  border-color: var(--primary-color);
+  background: white;
+  outline: none;
+}
+
+.dark .mobile-input {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dark .mobile-input:focus {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Mobile List Items */
+.mobile-list-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.mobile-list-item:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .mobile-list-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .mobile-list-item:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Pull to Refresh Indicator */
+.pull-indicator {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(90deg,
+      rgba(0, 0, 0, 0.06) 25%,
+      rgba(0, 0, 0, 0.12) 50%,
+      rgba(0, 0, 0, 0.06) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.06) 25%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.06) 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive Grid for Mobile */
+.mobile-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .mobile-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch Scroll */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Mobile Stats Card */
+.mobile-stat-card {
+  background: linear-gradient(135deg, rgba(66, 158, 189, 0.1) 0%, rgba(159, 231, 245, 0.05) 100%);
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(66, 158, 189, 0.2);
+}
+
+.dark .mobile-stat-card {
+  background: linear-gradient(135deg, rgba(66, 158, 189, 0.2) 0%, rgba(30, 41, 59, 0.8) 100%);
+}
+
+/* Swipe Actions Container */
+.swipe-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+/* Status Bar Protection */
+.status-bar-protect {
+  padding-top: max(env(safe-area-inset-top), 20px);
+}
+
+/* Bottom Safe Area Spacer */
+.bottom-spacer {
+  height: calc(env(safe-area-inset-bottom, 0px) + 80px);
+}

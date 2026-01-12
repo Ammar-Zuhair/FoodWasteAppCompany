@@ -1,0 +1,21 @@
+{
+  "iconBackgroundColor": "#000000",
+  "iconBackgroundColorDark": "#000000",
+  "splashBackgroundColor": "#000000",
+  "splashBackgroundColorDark": "#000000",
+  "icon": "resources/icon.png",
+  "splash": "resources/splash.png",
+  "android": {
+    "icon": "resources/icon.png",
+    "splash": "resources/splash.png"
+  }
+}
+
+
+
+
+
+
+
+
+
